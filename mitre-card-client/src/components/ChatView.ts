@@ -51,7 +51,10 @@ export default class ChatView extends chatProp {
         console.log('got textarea: '+this.input)
         this.chat.addMessage(new Message(this.chat.players[0],this.input))
         this.input=''
-    }   
+    }
+
+    
+    //make a post to api/messages/add 
 }
 
 

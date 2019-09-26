@@ -1,4 +1,4 @@
-import mongoose, { SchemaTypes } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const MessageSchema = new mongoose.Schema({
     time : {
@@ -7,20 +7,17 @@ const MessageSchema = new mongoose.Schema({
         trim: true,
     },
     player : {
-        type: SchemaTypes.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true,
     },
-    isBot : {
+    message : {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    isCommand : {
         type: Boolean,
         required: true,
-    },
-    resources : {
-        type: Number,
-        required: true,
-    },
-    hand : {
-        type: Array,
-        required: false,
     },
 });
 

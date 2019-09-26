@@ -4,6 +4,7 @@ import Component from 'vue-class-component'
 import MessagesView from './MessagesView'
 import {Chat} from '../model/chat'
 import Message from '../model/message';
+import MessagesApi from '../services/MessagesApi';
 
 // This is the way to do it. Pass that prop down to your class by extending this const.
 const chatProp = Vue.extend({
@@ -48,7 +49,9 @@ export default class ChatView extends chatProp {
     }
 
     send(){
-        console.log('got textarea: '+this.input)
+        console.log('got textarea: '+this.input);
+        
+        // MessagesApi.addMessage()
         this.chat.addMessage(new Message(this.chat.players[0],this.input))
         this.input=''
     }

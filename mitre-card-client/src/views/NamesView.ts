@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import NamesApi from '@/services/NamesApi';
+import PlayersApi from '@/services/PlayersApi';
 
 
 // @Component must preceed the class. We can pass some basic construction to our component here if needed.
@@ -28,7 +28,7 @@ export default class NamesView extends Vue{
     }
 
     private async getNames(){
-        const response = await NamesApi.fetchNames();
+        const response = await PlayersApi.fetchPlayers();
         this.names = response.data;
     }
 

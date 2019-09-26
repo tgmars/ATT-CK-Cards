@@ -1,25 +1,23 @@
 
-// import { UserDao } from '@daos';
 import { logger } from '@shared';
 import { Request, Response, Router, Express } from 'express';
 import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
 import { paramMissingError } from '@shared';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { PlayerModel } from '@entities';
+import cors from 'cors';
+import { MessageModel } from '@entities';
 
 // Init shared
 const router = Router();
-// const userDao = new UserDao();
-
 
 /******************************************************************************
- *                      Get All Users - "GET /api/users/all"
+ *                      Get All messages - "GET /api/messages/all"
  ******************************************************************************/
-router.get('/all',  async (req: Request, res: Response) => {
+router.get('/all', async (req: Request, res: Response) => {
     try {
-        // Get users from the database
-        const players = await PlayerModel.find({});
-        return res.status(OK).json({players});
+        // Get messages from the database
+        const messages = await MessageModel.find({});
+        return res.status(OK).json({messages});
     } catch (err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({
@@ -29,22 +27,22 @@ router.get('/all',  async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                       Add One - "POST /api/users/add"
+ *                       Add One - "POST /api/messages/add"
  ******************************************************************************/
 
 router.post('/add', async (req: Request, res: Response) => {
     try {
-        // Create a usermodel based on the request body content.
-        const player = new PlayerModel(req.body);
+        // Create a messagemodel based on the request body content.
+        const message = new MessageModel(req.body);
         // Error handling for an empty request
-        if (!player) {
+        if (!message) {
             return res.status(BAD_REQUEST).json({
                 error: paramMissingError,
             });
         }
         // Save the data into the model and send it to the database.
-        await player.save();
-        res.send(player);
+        await message.save();
+        res.send(message);
         return res.status(CREATED).end();
     } catch (err) {
         logger.error(err.message, err);
@@ -55,7 +53,7 @@ router.post('/add', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                       Update - "PUT /api/users/update"
+ *                       Update - "PUT /api/messages/update"
  ******************************************************************************/
 
 router.put('/update', async (req: Request, res: Response) => {
@@ -78,7 +76,7 @@ router.put('/update', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                    Delete - "DELETE /api/users/delete/:id"
+ *                    Delete - "DELETE /api/messages/delete/:id"
  ******************************************************************************/
 
 router.delete('/delete/:id', async (req: Request, res: Response) => {

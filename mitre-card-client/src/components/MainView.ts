@@ -5,6 +5,7 @@ import GameView from './GameView'
 import Navbar from './Navbar'
 import {Chat} from '../model/chat'
 import {GameBoard} from '../model/gameBoard'
+import PlayersApi from '@/services/PlayersApi'
 
 const MainViewProp = Vue.extend({
     props : {chat:Object as () => Chat,
@@ -33,15 +34,22 @@ const MainViewProp = Vue.extend({
 
 export default class MainView extends MainViewProp {
     
-    chatShown:boolean
+    private chatShown: boolean;
 
-    constructor(){
-        super()
-        this.chatShown=true   
+    constructor() {
+        super();
+        this.chatShown=true;
+        this.addPlayer();
     }
 
     toggleChatShown(){
         return this.chatShown = !this.chatShown
+    }
+
+    addPlayer() {
+        let id = Math.floor(Math.random()*10000);
+        console.log(PlayersApi.fetchPlayers());
+        PlayersApi.addPlayer('Player'+id,false);
     }
 }
      

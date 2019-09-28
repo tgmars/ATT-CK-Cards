@@ -1,4 +1,5 @@
 import Api from './Api';
+import { MessageInterface } from '@/model/message';
 
 export default {
     fetchMessages() {
@@ -6,8 +7,7 @@ export default {
     },
 
     /** Do not call this with data straight from the user, ensure validation first! */
-    addMessage(message: Object) {
-      return Api().post('api/messages/add', message);
+    addMessage(message: MessageInterface) {
+      return Api().post('api/messages/add', message );
     },
   };
-  

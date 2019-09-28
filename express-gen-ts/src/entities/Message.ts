@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import { PlayerModel } from './Player';
 
 const MessageSchema = new mongoose.Schema({
     time : {
@@ -9,6 +10,7 @@ const MessageSchema = new mongoose.Schema({
     player : {
         type: Schema.Types.ObjectId,
         required: true,
+        ref: 'Player',
     },
     message : {
         type: String,

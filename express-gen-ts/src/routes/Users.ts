@@ -29,6 +29,22 @@ router.get('/all',  async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
+ *                      Get a User By Name- "GET /api/users/:name"
+ ******************************************************************************/
+router.get('/:name',  async (req: Request, res: Response) => {
+    try {
+        // Get users from the database
+        const players = await PlayerModel.find({name: req.params.name});
+        return res.status(OK).json({players});
+    } catch (err) {
+        logger.error(err.message, err);
+        return res.status(BAD_REQUEST).json({
+            error: err.message,
+        });
+    }
+});
+
+/******************************************************************************
  *                       Add One - "POST /api/users/add"
  ******************************************************************************/
 

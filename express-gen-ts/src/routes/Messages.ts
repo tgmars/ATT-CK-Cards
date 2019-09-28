@@ -16,7 +16,7 @@ const router = Router();
 router.get('/all', async (req: Request, res: Response) => {
     try {
         // Get messages from the database
-        const messages = await MessageModel.find({});
+        const messages = await MessageModel.find({}).populate('player', 'name');
         return res.status(OK).json({messages});
     } catch (err) {
         logger.error(err.message, err);

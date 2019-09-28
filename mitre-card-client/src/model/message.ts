@@ -1,6 +1,20 @@
-import Player from './player';
+import Player from './playerInterface';
+import { state } from '@/main';
 
-export default class Message{
+export interface MessageInterface{
+        /** Time in epoch that message was sent by the client. */
+        time:number
+
+        // ID of the player object in the database.
+        player:string
+    
+        /** Message data.*/
+        message:string
+
+        isCommand:boolean
+}
+
+export class Message{
     
     /** Time in epoch that message was sent by the client. */
     time:number
@@ -45,8 +59,8 @@ export default class Message{
         console.log(this.time +': '+this.sender.name+': '+this.message+' : isCommand:'+this.isCommand()+' : isVisibleToAll:'+this.isVisibleToAll)
     }
 
-    toObject():Object{
-        return {'time':this.time,'player':this.sender,'message':this.message,'isCommand':this.isCommand()};
+    toObject():MessageInterface{
+        return {'time':this.time,'player':state.player._id,'message':this.message,'isCommand':this.isCommand()};
     }
 }
 

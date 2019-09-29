@@ -12,6 +12,7 @@ import socket from 'socket.io';
 import { MessageModel } from '@entities';
 import http from 'http';
 import { logger as consolelog } from './shared/Logger';
+import Command from './model/commands';
 
 // Init express
 const app = express();
@@ -44,12 +45,24 @@ io.on('connection', (sock) => {
   consolelog.info('Socket Connection Established with ID :' + sock.id);
     // Actions on a chat message received.
   sock.on('chat', async (chat) => {
-    // Save the message into the database
-    const response = await new MessageModel(chat).save();
-    // GIven the response, use its ID to query the DB for the entry and
-    // populate it with the appropriate name and send it back to connected clients.
-    const messages = await MessageModel.findById(response._id).populate('player', 'name');
-    io.emit('chat', messages);
+
+    // Check if the message is a command prior to actioning.
+    // We don't care if commands are saved to the database,  we want their outcomes interacting with ithe db.
+    if (chat.message.charAt(0) === '/') {
+      const command = new Command(chat.message, chat.player);
+      const result = await command.execute();
+      consolelog.info(JSON.stringify(result));
+      sock.emit('chat', result);
+    } else {
+      // If it's not a command, we want it shown to everyone and saved. 
+      // Save the message into the database
+      const response = await new MessageModel(chat).save();
+      // GIven the response, use its ID to query the DB for the entry and
+      // populate it with the appropriate name and send it back to connected clients.
+      const messages = await MessageModel.findById(response._id).populate('player', 'name');
+      io.emit('chat', messages);
+    }
+
   });
 });
 

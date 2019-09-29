@@ -19,7 +19,7 @@ const MainViewProp = Vue.extend({
     template:
     `
     <div>
-    <navbar @show-hide-clicked='toggleChatShown()'></navbar>
+    <navbar></navbar>
     <b-container fluid style='padding-right:0px;padding-left:0px;'>
         <b-row no-gutters>
             <b-col cols='3' v-if='chatShown' class='chat'>
@@ -37,16 +37,11 @@ const MainViewProp = Vue.extend({
 
 export default class MainView extends MainViewProp {
 
-    private chatShown: boolean;
+    chatShown = state.chatShown;
 
     constructor() {
         super();
-        this.chatShown = true;
         this.addPlayer();
-    }
-
-    public toggleChatShown() {
-        return this.chatShown = !this.chatShown;
     }
 
     /**

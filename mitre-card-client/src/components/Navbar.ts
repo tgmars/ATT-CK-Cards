@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { state } from '@/main'
 
 
 @Component({
@@ -13,7 +14,7 @@ import Component from 'vue-class-component'
   
       <b-collapse id='nav-collapse' is-nav>
         <b-navbar-nav>
-          <b-nav-item>Show/Hide Chat</b-nav-item>
+          <b-nav-item v-on:click='setChatShown'>Show/Hide Chat</b-nav-item>
           <b-nav-item>
             <router-link to="/stats">Statistics</router-link></b-nav-item>
         </b-navbar-nav>
@@ -31,7 +32,10 @@ export default class Navbar extends Vue {
     super()
   }
 
-
+  setChatShown(){
+    state.chatShown = !state.chatShown;
+  
+  }
 
 
 }

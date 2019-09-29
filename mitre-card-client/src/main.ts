@@ -17,6 +17,7 @@ Vue.use(VueSocketIOExt, socket);
 
 export let state: State = {
     player: {name: '', hand: [], isBot: false, resources: 0, role: false, _id: ''},
+    chatShown: true,
   };
   
 new Vue({

@@ -1,5 +1,5 @@
 import {AttackCard, DefenceCard, Card} from './card';
-import { mitre } from '..';
+// import { mitre } from '..';
 
 export default class Player {
     /**Initialises as player1 and player2. Use /setname in chat to overwrite.*/

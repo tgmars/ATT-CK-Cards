@@ -5,6 +5,9 @@ import { PlayerModel } from '@entities';
 import { GameModel } from '@entities';
 import { logger } from '@shared';
 import { Document } from 'mongoose';
+import { Router } from 'express';
+
+const router = Router();
 
 export default class Command {
     public recipient: string;
@@ -68,27 +71,23 @@ export default class Command {
                             attacker = opponentPlayer;
                             defender = currentPlayer;
                         }
-
                         const game = new GameModel(
                             {attacker: attacker._id, defender: defender._id, turn: false, playSpace: [], gameState: 'Defenders turn.'});
-
                         await game.save();
-
                         // Get the game id to use as a route and provide it to the user in the response.
                         const currentGame = await GameModel.find({attacker: attacker._id, defender: defender._id},
                              '_id');
-                        logger.info('Returned game: ' + JSON.stringify(currentGame));
+                        const currentGameID = currentGame[0].toObject()._id;
 
 
-                        return this.commandNewGame(opponentName , JSON.stringify(currentGame));
+                        return this.commandNewGame(opponentName , currentGameID);
                     } else {
-                        this.commandError('Could not find the specified opponents name, try again.');
+                        return this.commandError('Could not find the specified opponents name, try again.');
                     }
 
                 } catch (err) {
                     return this.commandError('Error occured creating game, it\'s likely database related.');
                 }
-                // return this.commandNewGame(this.commandArgs);
             }
             case '/listplayers': {
                 // Get users from the database

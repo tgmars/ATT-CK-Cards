@@ -10,13 +10,14 @@ import { state } from '@/main';
 @Component({
     template:
     `
-    <div>
+    <div> 
         <div style='padding-left:4px;'>
             <b-badge variant='secondary'>{{message.time | localDateTime}}</b-badge>
             <b-badge v-if='message.player.name == playername' variant='primary'>{{message.player.name}}</b-badge>
             <b-badge v-else variant='info'>{{message.player.name}}</b-badge>
             <span style='font-size:0.8em'>{{message.message}}</span>
         <hr style='margin-top:0.3rem;margin-bottom:0.3rem'>
+        </div>
     </div>
     `,
     filters : {

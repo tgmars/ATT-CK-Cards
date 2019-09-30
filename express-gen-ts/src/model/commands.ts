@@ -2,7 +2,9 @@ import { Message, MessageInterface } from './message';
 import Player from './playerInterface';
 import { GameBoard } from './gameBoard';
 import { PlayerModel } from '@entities';
+import { GameModel } from '@entities';
 import { logger } from '@shared';
+import { Document } from 'mongoose';
 
 export default class Command {
     public recipient: string;
@@ -40,13 +42,52 @@ export default class Command {
                     await PlayerModel.findByIdAndUpdate(this.recipient, {name: this.commandArgs});
                     return this.commandSetname(this.commandArgs);
                 } catch (err) {
-                    return this.commandError('Error occured updating your name.');
+                    return this.commandError('Error occured updating your name,  it\'s likely database related.');
                 }
             }
             case '/reply': {
                 return this.commandReply();
             }
             case '/newgame': {
+                try {
+                    // Just get the IDs of the current player and the opponent (all that's used for GameModel)
+                    const currentPlayer = await PlayerModel.findById(this.recipient, '_id');
+                    // find the opponent plaer by querying for their name.
+                    const opponentPlayer = await PlayerModel.findOne({name: this.commandArgs}, 'name');
+
+                    if (opponentPlayer && currentPlayer) {
+                        const opponentName = opponentPlayer.toObject().name;
+
+                        let attacker!: Document | null;
+                        let defender!: Document | null;
+
+                        if (Math.random() > 0.5) {
+                            attacker = currentPlayer;
+                            defender = opponentPlayer;
+                        } else {
+                            attacker = opponentPlayer;
+                            defender = currentPlayer;
+                        }
+
+                        const game = new GameModel(
+                            {attacker: attacker._id, defender: defender._id, turn: false, playSpace: [], gameState: 'Defenders turn.'});
+
+                        await game.save();
+
+                        // Get the game id to use as a route and provide it to the user in the response.
+                        const currentGame = await GameModel.find({attacker: attacker._id, defender: defender._id},
+                             '_id');
+                        logger.info('Returned game: ' + JSON.stringify(currentGame));
+
+
+                        return this.commandNewGame(opponentName , JSON.stringify(currentGame));
+                    } else {
+                        this.commandError('Could not find the specified opponents name, try again.');
+                    }
+
+                } catch (err) {
+                    return this.commandError('Error occured creating game, it\'s likely database related.');
+                }
                 // return this.commandNewGame(this.commandArgs);
             }
             case '/listplayers': {
@@ -100,33 +141,16 @@ export default class Command {
      * @param opponentName Name of the opponent to initiate a game with
      * @param players List of plays in the chat. Used to determine if the providedOpponent name is valid.
      */
-    // public commandNewGame(opponentName: string, players: Array<Player>): MessageInterface {
-    //     // Generate a new game sitting at a new route. Players go to the route to play that game instance
-    //     let opponentPlayer = new Player(false, false, false, 'newgame-creation-failed', true);
-    //     const invalidOpponentName: boolean = false;
-    //     players.forEach(function(player: Player) {
-    //         if (player.name == opponentName) {
-    //             opponentPlayer = player;
-    //         }
-    //     });
-    //     // Rely on the case that if no valid opponent was found, the default name of opponentPlayer wouldn't
-    //     // have changed, thus we can check for it as a fail condition and return the oppropriate message.
-    //     if (opponentPlayer.name == 'newgame-creation-failed') {
-    //         return this.createCommandResponse('No opponent identified with name ' + opponentName);
-    //     } else {
-    //         opponentPlayer.opponent = true
-    //         const game = new GameBoard(this.message.sender, opponentPlayer);
-    //         // Stub for hooking the gameboard up to a page.
-    //         // game.linkToRoute()
-    //         return this.createCommandResponse('Game created with ' + opponentName + '. The game is at: url/' + game.gameID);
-    //     }
-    // }
+    public commandNewGame(opponentName: string, gameID: string): MessageInterface {
+            // Stub for hooking the gameboard up to a page.
+            // game.linkToRoute()
+            return this.createCommandResponse('Game created with ' + opponentName + '. The game is at: url/' + gameID);
+    }
 
     public commandInvalid(): MessageInterface {
         return this.createCommandResponse(`Invalid command. Send a command by using a forward slash
         (/) prior to the command. Available options are: ` + this.commands);
     }
-
 
     public commandError(message: string): MessageInterface {
         return this.createCommandResponse('COMMAND ERROR: ' + message);

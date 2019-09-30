@@ -1,20 +1,23 @@
 import mongoose, { Schema } from 'mongoose';
-import { PlayerModel } from './Player';
 
 const GameSchema = new mongoose.Schema({
     attacker : {
         type: Schema.Types.ObjectId,
         required: true,
-        trim: true,
+        ref: 'Player',
     },
     defender : {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'Player',
     },
+    turn: {
+        type: Boolean,
+        required: true,
+    },
     gameState : {
         type: String,
-        required: true,
+        required: true, 
         trim: true,
     },
     playSpace : {

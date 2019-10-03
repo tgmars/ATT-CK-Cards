@@ -1,5 +1,6 @@
 import Player from './player';
 import { Card, AttackCard, DefenceCard } from './card';
+import { state } from '@/main';
 
 class GameBoard {
     
@@ -34,6 +35,23 @@ class GameBoard {
         this.valid=true
         this.gameStateMessage='Gamestate: Playing'
         console.log('Currentturn: '+this.currentTurn)
+    }
+
+    setBoard(gameData:any){
+        console.log('updating board details with received gameData...')
+        console.log('gamedata id: ' + gameData._id)
+        this.gameID = gameData._id;
+        this.gameStateMessage = gameData.gameState;
+        this.currentTurn = gameData.turn;
+        if(gameData.attacker == state.player._id) {
+            this.player = gameData.attacker;
+            this.opponent = gameData.defender;
+        } else if (gameData.defender == state.player._id) {
+            this.player = gameData.defender;
+            this.opponent = gameData.attacker;
+        }
+        this.playSpace = [];
+        
     }
 
     getPlayer():Player{ return this.player }

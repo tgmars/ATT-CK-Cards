@@ -10,5 +10,6 @@ export default interface Player {
     /** Additional role for bot player */
     isBot: boolean;
     resources: number;
-
+    progress: Array<Boolean>;
+    persistentProgress: Array<Boolean>;
 }

@@ -45,6 +45,22 @@ router.get('/:name',  async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
+ *                      Get a User By ID- "GET /api/users/:id"
+ ******************************************************************************/
+router.get('/id/:id',  async (req: Request, res: Response) => {
+    try {
+        // Get users from the database
+        const players = await PlayerModel.findById(req.params.id);
+        return res.status(OK).json({players});
+    } catch (err) {
+        logger.error(err.message, err);
+        return res.status(BAD_REQUEST).json({
+            error: err.message,
+        });
+    }
+});
+
+/******************************************************************************
  *                       Add One - "POST /api/users/add"
  ******************************************************************************/
 

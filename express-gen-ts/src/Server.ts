@@ -51,8 +51,12 @@ io.on('connection', (sock) => {
     if (chat.message.charAt(0) === '/') {
       const command = new Command(chat.message, chat.player);
       const result = await command.execute();
-      consolelog.info(JSON.stringify(result));
-      sock.emit('chat', result);
+
+      if ((result.message.substring(0, 12) === 'Game created') || result.message.substring(0, 11) === 'Name change') {
+        io.emit('chat', result);
+      } else {
+        sock.emit('chat', result);
+      }
     } else {
       // If it's not a command, we want it shown to everyone and saved. 
       // Save the message into the database
@@ -77,7 +81,6 @@ const viewsDir = path.join(__dirname, 'views');
 app.set('views', viewsDir);
 
 app.get('*', (req: Request, res: Response) => {
-    // res.send({name: 'Tom'});
     res.sendFile('index.html', {root: viewsDir});
 });
 

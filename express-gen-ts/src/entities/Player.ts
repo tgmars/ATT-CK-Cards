@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 const PlayerSchema = new mongoose.Schema({
     name : {
@@ -21,6 +21,12 @@ const PlayerSchema = new mongoose.Schema({
     hand : {
         type: Array,
         required: false,
+    },
+    progress : {
+        type: Array,
+    },
+    persistentProgress : {
+        type: Array,
     },
 });
 

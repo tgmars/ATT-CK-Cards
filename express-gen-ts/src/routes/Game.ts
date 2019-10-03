@@ -16,8 +16,10 @@ const router = Router();
 router.get('/:gameid' , async (req: Request, res: Response) => {
     try {
         // Get messages from the database
-        const gameData = await GameModel.findById({$gameid}).populate('player', 'name');
-        return res.status(OK).json({messages});
+        const id: string = req.params.gameid;
+        logger.info('Param ID: ' + id.valueOf);
+        const gameData = await GameModel.findById(id).populate('player', 'name');
+        return res.status(OK).json({gameData});
     } catch (err) {
         logger.error(err.message, err);
         return res.status(BAD_REQUEST).json({

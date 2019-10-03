@@ -22,7 +22,12 @@ export let state: State = {
   
 new Vue({
   router,
-  render: (h) => h(MainView),
+  template:`
+    <div id="app">
+
+        <router-view class="view"></router-view>
+
+    </div>`,
 }).$mount('#app');
 
 

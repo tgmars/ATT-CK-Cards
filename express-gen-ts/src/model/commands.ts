@@ -43,7 +43,7 @@ export default class Command {
             case '/setname': {
                 try {
                     await PlayerModel.findByIdAndUpdate(this.recipient, {name: this.commandArgs});
-                    return this.commandSetname(this.commandArgs);
+                    return this.commandSetname(this.recipient, this.commandArgs);
                 } catch (err) {
                     return this.commandError('Error occured updating your name,  it\'s likely database related.');
                 }
@@ -79,8 +79,7 @@ export default class Command {
                              '_id');
                         const currentGameID = currentGame[0].toObject()._id;
 
-
-                        return this.commandNewGame(opponentName , currentGameID);
+                        return this.commandNewGame(this.recipient, opponentName , currentGameID);
                     } else {
                         return this.commandError('Could not find the specified opponents name, try again.');
                     }
@@ -123,8 +122,8 @@ export default class Command {
         (/) prior to the command. Available options are: ` + this.commands);
     }
 
-    public commandSetname(name: string): MessageInterface {
-        return this.createCommandResponse('Name changed to : ' + name);
+    public commandSetname(oldname: string, name: string): MessageInterface {
+        return this.createCommandResponse('Name change: ' + oldname + ' changed name to : ' + name);
     }
 
     public commandReply(): MessageInterface {
@@ -140,10 +139,10 @@ export default class Command {
      * @param opponentName Name of the opponent to initiate a game with
      * @param players List of plays in the chat. Used to determine if the providedOpponent name is valid.
      */
-    public commandNewGame(opponentName: string, gameID: string): MessageInterface {
+    public commandNewGame(opponentName: string, playerName: string, gameID: string): MessageInterface {
             // Stub for hooking the gameboard up to a page.
             // game.linkToRoute()
-            return this.createCommandResponse('Game created with ' + opponentName + '. The game is at: url/' + gameID);
+            return this.createCommandResponse('Game created between ' + playerName + ' and ' + opponentName + '. The game is available at /games/' + gameID);
     }
 
     public commandInvalid(): MessageInterface {

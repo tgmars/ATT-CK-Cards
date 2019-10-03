@@ -27,7 +27,6 @@ import PlayersApi from '@/services/PlayersApi';
     template:
     `
     <div>
-    {{$route.params.gameID}}
         <game-status-view :gameboard='gameboard'></game-status-view>
         <div v-if='!gameboard.valid'>
             <b-container style='margin:3px'>
@@ -145,10 +144,10 @@ import PlayersApi from '@/services/PlayersApi';
 })
 export default class GameView extends Vue {
 
-    public player!: Player;
-    public opponent!: Player;
+    public player: Player;
+    public opponent: Player;
 
-    public gameboard!: GameBoard;
+    public gameboard: GameBoard;
 
     public input: string = '';
     public attackVisible: boolean = true;
@@ -182,15 +181,26 @@ export default class GameView extends Vue {
         console.log('gameview mount this.gameID: ' + this.gameID)
         //  Make a GET to the API and request the game for our given id.
         GamesApi.fetchGamesByID(this.gameID).then((response) => {
-            this.gameboard.setBoard(response);
-            // console.log('attacker response' + response.data.gameData.attacker)
-            // console.log('state player: ' + state.player._id)
+            this.gameboard.setBoard(response.data.gameData);
+            console.log('gameboard opponent name: ' + this.gameboard.opponent.id)
+            console.log('gmaeboard player name: ' + this.gameboard.player.id)
 
-            // console.log('defender response' + response.data.gameData.defender)
-            // console.log('state player: ' + state.player._id)
+            PlayersApi.fetchPlayerByID(this.gameboard.player.id).then((resp) => {
+                const res = resp.data;
+                // Map player data from server to a local object.
+                console.log('got player: ' + JSON.stringify(res))
 
-            // gameboard = new GameBoard()
+            });
+            PlayersApi.fetchPlayerByID(this.gameboard.opponent.id).then((resp) => {
+                const res = resp.data;
+                // Map player data from server to a local object.
+                console.log('got opponent: ' + JSON.stringify(res))
+
+
+            });
         });
+
+
 
     }
 

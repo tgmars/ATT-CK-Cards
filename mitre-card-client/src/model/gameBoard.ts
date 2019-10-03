@@ -40,18 +40,18 @@ class GameBoard {
     setBoard(gameData:any){
         console.log('updating board details with received gameData...')
         console.log('gamedata id: ' + gameData._id)
+
         this.gameID = gameData._id;
         this.gameStateMessage = gameData.gameState;
         this.currentTurn = gameData.turn;
         if(gameData.attacker == state.player._id) {
-            this.player = gameData.attacker;
-            this.opponent = gameData.defender;
+            this.player.id = gameData.attacker;
+            this.opponent.id = gameData.defender;
         } else if (gameData.defender == state.player._id) {
-            this.player = gameData.defender;
-            this.opponent = gameData.attacker;
+            this.player.id = gameData.defender;
+            this.opponent.id = gameData.attacker;
         }
         this.playSpace = [];
-        
     }
 
     getPlayer():Player{ return this.player }
@@ -73,14 +73,16 @@ class GameBoard {
      * Return true if it is the attackers turn for this game.
      */
     isAttackerTurn(){
-        return (((this.isPlayerTurn() && this.getPlayer().isAttacker())||(this.isOpponentTurn() && this.getOpponent().isAttacker()))?true:false)
+        return (this.currentTurn ? true : false)
+        // return (((this.isPlayerTurn() && this.getPlayer().isAttacker())||(this.isOpponentTurn() && this.getOpponent().isAttacker()))?true:false)
     }
 
     /**
      * Return true if it is the defenders for for this game.
      */
     isDefenderTurn(){
-        return (((this.isPlayerTurn() && this.getPlayer().isDefender())||(this.isOpponentTurn() && this.getOpponent().isDefender()))?true:false)
+        return (this.currentTurn ? false : true)
+        // return (((this.isPlayerTurn() && this.getPlayer().isDefender())||(this.isOpponentTurn() && this.getOpponent().isDefender()))?true:false)
     }
 
     /**

@@ -16,6 +16,8 @@ export default class Player {
     public handMaxLength: number = 5;
     public deck?: Array<Card>;
 
+    public id: string = '';
+
     public progress = {'initial-access': true, 'execution': false, 'persistence': false, 'privilege-escalation': false,
                             'defense-evasion': false, 'credential-access': false, 'discovery': false,
                             'lateral-movement': false, 'collection': false, 'command-and-control': false,

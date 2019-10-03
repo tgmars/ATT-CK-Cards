@@ -12,7 +12,7 @@ const gameStatusViewProp = Vue.extend({
     template:
     `
     <div>
-        {{gameboard.gameStateMessage}} - GameID: {{gameboard.gameID}} 
+        <p>GameID: {{gameboard.gameID}} --- {{gameboard.gameStateMessage}}</p>
         <p v-if='gameboard.isAttackerTurn()'>Current turn: Attacker </p>
         <p v-if='gameboard.isDefenderTurn()'>Current turn: Defender </p>
     </div>

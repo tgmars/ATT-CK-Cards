@@ -20,12 +20,12 @@ export default class Player {
 
     public progress = {'initial-access': true, 'execution': false, 'persistence': false, 'privilege-escalation': false,
                             'defense-evasion': false, 'credential-access': false, 'discovery': false,
-                            'lateral-movement': false, 'collection': false, 'command-and-control': false,
+                            'lateral-movement': false, 'collecting': false, 'command-and-control': false,
                             'exfiltration': false, 'impact': false};
 
     public persistentProgress = {'initial-access': true, 'execution': false, 'persistence': false, 'privilege-escalation': false,
     'defense-evasion': false, 'credential-access': false, 'discovery': false,
-    'lateral-movement': false, 'collection': false, 'command-and-control': false,
+    'lateral-movement': false, 'collecting': false, 'command-and-control': false,
     'exfiltration': false, 'impact': false};
 
     // mitre:Array<Object>
@@ -46,6 +46,19 @@ export default class Player {
         this.opponent = opponent;
         this.resources = 100;
 
+    }
+
+    public setPlayer(player: any){
+        this.name = player.name;
+        this.role = player.role;
+        this.isBot = player.isBot;
+        this.id = player._id;
+        this.hand = player.hand;
+        this.resources = player.resources;
+        this.progress = player.progress;
+        this.persistentProgress = this.progress
+
+        
     }
 
     /**
@@ -156,6 +169,14 @@ export default class Player {
             }
     }
 
+    // Set all cards in a players hand either faceup(pass true) or
+    //  facedown (pass false)
+    public setHandFaceup(up: boolean){
+        this.hand.forEach((card) => {
+            card.faceup = up;
+        });
+    }
+
     /** Nope */
     public setProgress(tactic: string) {
         switch (tactic) {
@@ -204,12 +225,12 @@ export default class Player {
             }
             case 'lateral-movement': {
                 this.progress['lateral-movement'] = false;
-                this.progress.collection= true;
-                this.persistentProgress.collection= true;
+                this.progress.collecting= true;
+                this.persistentProgress.collecting= true;
                 break;
             }
-            case 'collection': {
-                this.progress.collection= false;
+            case 'collecting': {
+                this.progress.collecting= false;
                 this.progress['command-and-control'] = true;
                 this.persistentProgress['command-and-control'] = true;
                 break;

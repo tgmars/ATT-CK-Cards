@@ -20,7 +20,8 @@
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.3",
     "vue-socket.io": "^3.0.7",
-    "vue-socket.io-extended": "^4.0.0"
+    "vue-socket.io-extended": "^4.0.0",
+    "vue-template-validator": "^1.1.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-typescript": "^3.11.0",

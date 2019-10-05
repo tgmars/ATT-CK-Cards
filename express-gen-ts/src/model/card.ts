@@ -1,4 +1,4 @@
-import {mitre} from '../index'
+import {mitre} from '../Server'
 
 class Card {
     faceup:boolean

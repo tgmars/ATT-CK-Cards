@@ -11,7 +11,7 @@ import { GameModel } from '@entities';
 const router = Router();
 
 /******************************************************************************
- *                      Get All messages - "GET /api/game/all"
+ *                      Get game by ID - "GET /api/game/:gameid"
  ******************************************************************************/
 router.get('/:gameid' , async (req: Request, res: Response) => {
     try {

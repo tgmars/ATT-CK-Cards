@@ -6,11 +6,11 @@ import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
 import { paramMissingError } from '@shared';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { PlayerModel } from '@entities';
+import Player from 'src/model/player';
 
 // Init shared
 const router = Router();
 // const userDao = new UserDao();
-
 
 /******************************************************************************
  *                      Get All Users - "GET /api/users/all"
@@ -61,12 +61,12 @@ router.get('/id/:id',  async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                       Add One - "POST /api/users/add"
+ *                       Add One User - "POST /api/users/add"
  ******************************************************************************/
 
 router.post('/add', async (req: Request, res: Response) => {
     try {
-        // Create a usermodel based on the request body content.
+        // Create a usermodel based on the request body content and serverside generated content.
         const player = new PlayerModel(req.body);
         // Error handling for an empty request
         if (!player) {

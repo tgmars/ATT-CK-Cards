@@ -14,6 +14,8 @@ import http from 'http';
 import { logger as consolelog } from './shared/Logger';
 import Command from './model/commands';
 
+export let mitre = require('./resources/attack-techniques-20190811.json');
+
 // Init express
 const app = express();
 const httpsrv = http.createServer(app);
@@ -58,7 +60,7 @@ io.on('connection', (sock) => {
         sock.emit('chat', result);
       }
     } else {
-      // If it's not a command, we want it shown to everyone and saved. 
+      // If it's not a command, we want it shown to everyone and saved.
       // Save the message into the database
       const response = await new MessageModel(chat).save();
       // GIven the response, use its ID to query the DB for the entry and

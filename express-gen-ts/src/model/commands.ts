@@ -1,5 +1,6 @@
 import { Message, MessageInterface } from './message';
-import Player from './playerInterface';
+import IPlayer from './playerInterface';
+import Player from './player';
 import { GameBoard } from './gameBoard';
 import { PlayerModel } from '@entities';
 import { GameModel } from '@entities';
@@ -16,7 +17,7 @@ export default class Command {
     public commands: string[] = ['/help', '/setname', '/newgame', '/listplayers', '/reply'];
 
     // Initialise a new commandbot player as the sender of the message.
-    public commandBot: Player = {name: 'Command Bot', _id: '', hand: [], isBot: true, resources: 0, role: false};
+    public commandBot: IPlayer = {name: 'Command Bot', _id: '', hand: [], isBot: true, resources: 0, role: false};
 
     constructor(message: string, sender: string) {
         this.recipient = sender;
@@ -53,23 +54,36 @@ export default class Command {
             }
             case '/newgame': {
                 try {
+                    // Fetch players, modify the players, add entries for the game in the database
                     // Just get the IDs of the current player and the opponent (all that's used for GameModel)
-                    const currentPlayer = await PlayerModel.findById(this.recipient, '_id');
+                    const currentPlayer = await PlayerModel.findById(this.recipient, 'name');
                     // find the opponent plaer by querying for their name.
                     const opponentPlayer = await PlayerModel.findOne({name: this.commandArgs}, 'name');
 
                     if (opponentPlayer && currentPlayer) {
                         const opponentName = opponentPlayer.toObject().name;
+                        const currentName = currentPlayer.toObject().name;
 
                         let attacker!: Document | null;
                         let defender!: Document | null;
+                        let cpIsAttacker: boolean = false;
+                        let opIsAttacker: boolean = false;
 
                         if (Math.random() > 0.5) {
                             attacker = currentPlayer;
                             defender = opponentPlayer;
+                            await currentPlayer.update( {role: true} );
+                            await opponentPlayer.update( {role: false} );
+                            cpIsAttacker = true;
+                            opIsAttacker = false;
+
                         } else {
                             attacker = opponentPlayer;
                             defender = currentPlayer;
+                            await currentPlayer.update( {role: false} );
+                            await opponentPlayer.update( {role: true} );
+                            cpIsAttacker = false;
+                            opIsAttacker = true;
                         }
                         const game = new GameModel(
                             {attacker: attacker._id, defender: defender._id, turn: false, playSpace: [], gameState: 'Defenders turn.'});
@@ -79,7 +93,20 @@ export default class Command {
                              '_id');
                         const currentGameID = currentGame[0].toObject()._id;
 
-                        return this.commandNewGame(this.recipient, opponentName , currentGameID);
+                        // Update the players with their roles as attackers or defenders.
+                        // Good lord this is getting messy
+
+                        const playerObject = new Player(cpIsAttacker, false, 'tempplay', false);
+                        const opponentObject = new Player(opIsAttacker, false, 'tempop', true);
+                        playerObject.draw(5);
+                        opponentObject.draw(5);
+                        
+                        // Setup hand and the players progress
+                        await currentPlayer.update( {hand: playerObject.hand, progress: playerObject.progress});
+                        await opponentPlayer.update( {hand: opponentObject.hand, progress: opponentObject.progress});
+                       
+
+                        return this.commandNewGame(currentName, opponentName , currentGameID);
                     } else {
                         return this.commandError('Could not find the specified opponents name, try again.');
                     }

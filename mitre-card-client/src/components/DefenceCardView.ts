@@ -17,7 +17,7 @@ const defenceCardProp = Vue.extend({
             border-variant='primary'
             header-border-variant='primary'
             v-bind:sub-title=defenceCard.dataSource
-            v-on:click='$emit('card-click')'
+            v-on:click='$emit(card-click)'
             style='width: 220px;height:110px;font-size:12px;margin:0'
             ref='defenceCardDiv' 
         >   
@@ -33,7 +33,7 @@ const defenceCardProp = Vue.extend({
 
         <b-card v-else
         header='Defence'
-        v-on:click='$emit('card-click')' 
+        v-on:click='$emit(card-click)' 
         border-variant='info'
         header-border-variant='info'
         style='width:220px;height:110px;margin:0;font-size:12px'

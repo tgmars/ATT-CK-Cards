@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import { ProgressSchema } from './Progress';
 
 const PlayerSchema = new mongoose.Schema({
     name : {
@@ -22,12 +23,7 @@ const PlayerSchema = new mongoose.Schema({
         type: Array,
         required: false,
     },
-    progress : {
-        type: Array,
-    },
-    persistentProgress : {
-        type: Array,
-    },
+    progress :  ProgressSchema,
 });
 
 export const PlayerModel = mongoose.model('Player', PlayerSchema);

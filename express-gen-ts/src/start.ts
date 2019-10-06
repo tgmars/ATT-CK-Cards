@@ -17,17 +17,18 @@ async function readGamesDB() {
     gamedocs.forEach((gamedoc) => {
         const obj = gamedoc.toObject();
         const player = obj.attacker;
-        const p1: Player = new Player(true,false,player.name,false);
+        const p1: Player = new Player(true, false, player.name, false);
         p1.setPlayer(player);
 
         const opp = obj.defender;
-        const p2: Player = new Player(false,false,opp.name,true);
+        const p2: Player = new Player(false, false, opp.name, true);
         p2.setPlayer(opp);
 
-        const game = new GameBoard(p1,p2)
+        const game = new GameBoard(p1, p2);
         game.setBoard(obj);
         state.games.push(game);
     });
+    logger.info('Imported server games.');
 }
 
 readGamesDB();

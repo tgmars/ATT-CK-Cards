@@ -56,9 +56,7 @@ export default class Player {
         this.hand = player.hand;
         this.resources = player.resources;
         this.progress = player.progress;
-        this.persistentProgress = this.progress
-
-        
+        this.persistentProgress = this.progress        
     }
 
     /**

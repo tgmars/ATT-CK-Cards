@@ -19,7 +19,7 @@ import PlayersApi from '@/services/PlayersApi';
     template:
     `
     <div>
-        <game-status-view :gameboard='gameboard'></game-status-view>
+        <span><game-status-view :gameboard='gameboard'></game-status-view> -- {{player.name}} {{gameboard.player.name}} {{gameboard.playSpace}}</span>
         <div v-if='!gameboard.valid'>
             <b-container style='margin:3px'>
             <b-row v-if='gameboard.opponent.role'>
@@ -212,8 +212,11 @@ export default class GameView extends Vue {
     get playSpaceAttackCards() {
         const ac: any = [];
         this.gameboard.playSpace.forEach((element) => {
-            if (element instanceof AttackCard) {
+            if (element.tactic != undefined) {
                 ac.splice(ac.length, 0, element);
+            }else{
+                console.log('We did not return any card because theyre not prooper attack cards.');
+
             }
         });
         return ac;
@@ -222,8 +225,10 @@ export default class GameView extends Vue {
     get playSpaceDefenceCards() {
         const dc: any = [];
         this.gameboard.playSpace.forEach((element) => {
-            if (element instanceof DefenceCard) {
+            if (element.dataSource != undefined) {
                 dc.splice(dc.length, 0, element);
+            }else{
+                console.log('We did not return any cards because theyre not prooper defence cards.');
             }
         });
         return dc;
@@ -257,11 +262,15 @@ export default class GameView extends Vue {
 
     @Socket('gameplay')  // --> listens to the event labelled chat
     public onGameplay(gameboard: GameBoard) {
-        console.log('received gameboard update over websocket: ' + gameboard);
+        console.log('received gameboard update over websocket: ' + JSON.stringify(gameboard));
+        this.opponent.setPlayer(gameboard.player);
+        this.opponent.setHandFaceup(false);
+        this.player.setPlayer(gameboard.opponent);
+        this.player.setHandFaceup(false);
+        this.gameboard.setBoard(gameboard);
         // pass gameboard and players as parameters to onGameplay
         // Set player for opponent and player
         // Set the facuep values of the cards. 
         // Set gameboard
-        this.gameboard = gameboard;
     }
 }

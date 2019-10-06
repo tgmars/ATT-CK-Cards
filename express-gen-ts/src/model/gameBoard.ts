@@ -33,7 +33,6 @@ class GameBoard {
 
         this.valid = true;
         this.gameStateMessage = 'Gamestate: Playing';
-        console.log('Currentturn: ' + this.currentTurn);
     }
 
     public setBoard(gameData:any){
@@ -60,6 +59,10 @@ class GameBoard {
     public isOpponentTurn() { return (!this.currentTurn ? true : false); }
 
     public isValid() { return(this.valid ? true : false); }
+
+    public toCompliantObject() {
+        return {playSpace: this.playSpace, gameState: this.gameStateMessage, turn: this.currentTurn};
+    }
 
     /**
      * Return true if it is the attackers turn for this game.

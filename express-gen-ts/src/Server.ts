@@ -9,7 +9,7 @@ import bodyParser from 'body-parser';
 import mongoose, { STATES } from 'mongoose';
 import { url } from '../../access';
 import socket from 'socket.io';
-import { MessageModel } from '@entities';
+import { MessageModel, GameModel, PlayerModel } from '@entities';
 import http from 'http';
 import { logger as consolelog } from './shared/Logger';
 import Command from './model/commands';
@@ -76,16 +76,26 @@ io.on('connection', (sock) => {
   });
 
   sock.on('gameplay', async (index) => {
-    consolelog.info(JSON.stringify(index))
     // We receive a request with an attack turn
     // states.games
     if (index.attackerindex != undefined) {
       consolelog.info(JSON.stringify(index))
       // Get the index to the game held in state that we care about
       const gameIndex = state.games.findIndex((game) => game.gameID == index.gameID);
+      consolelog.info('server state preplay: ' + JSON.stringify(state.games[gameIndex]));
       state.games[gameIndex].attackerPlay(index.attackerindex);
-      consolelog.info('server state game: ' + state.games[gameIndex]);
-
+      consolelog.info('server state postplay: ' + JSON.stringify(state.games[gameIndex]));
+      
+      try {
+        await GameModel.findByIdAndUpdate(index.gameID, state.games[gameIndex].toCompliantObject() );
+        await PlayerModel.findByIdAndUpdate(state.games[gameIndex].player._id,
+          state.games[gameIndex].player.toCompliantObject());
+        await PlayerModel.findByIdAndUpdate(state.games[gameIndex].opponent._id,
+          state.games[gameIndex].opponent.toCompliantObject());
+        consolelog.info('Updated game and both player models');  
+        } catch (err) {
+        consolelog.error('Error while finding and updating game collection with latest turn.');
+      }
       sock.emit('gameplay', state.games[gameIndex]);
       consolelog.info('emitted a gameplay event back over the socket - NO BROADCAST');
       // modifys the relevant player and the gameboard
@@ -100,9 +110,23 @@ io.on('connection', (sock) => {
       consolelog.info(JSON.stringify(index))
 
       const gameIndex = state.games.findIndex((game) => game.gameID == index.gameID);
+
+      consolelog.info('server state preplay: ' + JSON.stringify(state.games[gameIndex]));
+
       state.games[gameIndex].defenderPlay(index.defenderindex);
 
-      consolelog.info('server state game: ' + state.games[gameIndex])
+      consolelog.info('server state preplay: ' + JSON.stringify(state.games[gameIndex]));
+
+      try {
+        await GameModel.findByIdAndUpdate(index.gameID, state.games[gameIndex].toCompliantObject() );
+        await PlayerModel.findByIdAndUpdate(state.games[gameIndex].player._id,
+          state.games[gameIndex].player.toCompliantObject());
+        await PlayerModel.findByIdAndUpdate(state.games[gameIndex].opponent._id,
+          state.games[gameIndex].opponent.toCompliantObject());
+        consolelog.info('Updated game and both player models');
+        } catch (err) {
+        consolelog.error('Error while finding and updating game collection with latest turn.');
+      }
 
       sock.emit('gameplay', state.games[gameIndex]);
       consolelog.info('emitted a gameplay event back over the socket - NO BROADCAST');

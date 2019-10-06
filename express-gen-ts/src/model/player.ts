@@ -46,7 +46,7 @@ export default class Player {
         this.resources = 100;
 
     }
-
+    // Given JSON from a request, update a local object.
     public setPlayer(player: any) {
         this.name = player.name;
         this.role = player.role;
@@ -57,6 +57,11 @@ export default class Player {
         this.progress = player.progress;
         this.persistentProgress = player.persistentProgress;
 
+    }
+
+    // Generate JSON for a database update from the current object.
+    public toCompliantObject() {
+        return {hand: this.hand, progress: this.progress, resources: this.resources};
     }
 
     /**

@@ -16,7 +16,7 @@ export default class Player {
     public handMaxLength: number = 5;
     public deck?: Array<Card>;
 
-    public id: string = '';
+    public '_id': string = '';
 
     public progress = {'initial-access': true, 'execution': false, 'persistence': false, 'privilege-escalation': false,
                             'defense-evasion': false, 'credential-access': false, 'discovery': false,
@@ -52,7 +52,7 @@ export default class Player {
         this.name = player.name;
         this.role = player.role;
         this.isBot = player.isBot;
-        this.id = player._id;
+        this._id = player._id;
         this.hand = player.hand;
         this.resources = player.resources;
         this.progress = player.progress;

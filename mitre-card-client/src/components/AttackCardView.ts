@@ -15,7 +15,7 @@ const acstring =     `
 <div style='padding:2px'>
     <b-card v-if='attackCard.faceup'
         v-bind:header=attackCard.tactic
-        v-on:click='$emit(card-click)'
+        v-on:click="$emit('card-click')"
         v-bind:sub-title=attackCard.technique
         border-variant='danger'
         header-border-variant='danger'
@@ -33,7 +33,7 @@ const acstring =     `
 
     <b-card v-else
     header='Attack'
-    v-on:click='$emit(card-click)'
+    v-on:click="$emit('card-click')"
     bg-variant='danger'
     header-variant='danger'
     text-variant='white'

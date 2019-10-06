@@ -6,13 +6,16 @@ import path from 'path';
 import BaseRouter from './routes';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
+import mongoose, { STATES } from 'mongoose';
 import { url } from '../../access';
 import socket from 'socket.io';
 import { MessageModel } from '@entities';
 import http from 'http';
 import { logger as consolelog } from './shared/Logger';
 import Command from './model/commands';
+import { GameBoard } from './model/gameBoard';
+import { IState } from './State';
+// import {onChat} from './SocketHandler';
 
 export let mitre = require('./resources/attack-techniques-20190811.json');
 
@@ -43,12 +46,14 @@ mongoose.connect(url, {useNewUrlParser: true });
 
 const io =  socket(httpsrv);
 
+export let state: IState = {games : []};
+
 io.on('connection', (sock) => {
   consolelog.info('Socket Connection Established with ID :' + sock.id);
     // Actions on a chat message received.
   sock.on('chat', async (chat) => {
-
-    // Check if the message is a command prior to actioning.
+    // await onChat(io, sock, chat);
+        // Check if the message is a command prior to actioning.
     // We don't care if commands are saved to the database,  we want their outcomes interacting with ithe db.
     if (chat.message.charAt(0) === '/') {
       const command = new Command(chat.message, chat.player);
@@ -59,7 +64,7 @@ io.on('connection', (sock) => {
       } else {
         sock.emit('chat', result);
       }
-    } else {
+  } else {
       // If it's not a command, we want it shown to everyone and saved.
       // Save the message into the database
       const response = await new MessageModel(chat).save();
@@ -67,8 +72,43 @@ io.on('connection', (sock) => {
       // populate it with the appropriate name and send it back to connected clients.
       const messages = await MessageModel.findById(response._id).populate('player', 'name');
       io.emit('chat', messages);
-    }
+  }
+  });
 
+  sock.on('gameplay', async (index) => {
+    consolelog.info(JSON.stringify(index))
+    // We receive a request with an attack turn
+    // states.games
+    if (index.attackerindex != undefined) {
+      consolelog.info(JSON.stringify(index))
+      // Get the index to the game held in state that we care about
+      const gameIndex = state.games.findIndex((game) => game.gameID == index.gameID);
+      state.games[gameIndex].attackerPlay(index.attackerindex);
+      consolelog.info('server state game: ' + state.games[gameIndex]);
+
+      sock.emit('gameplay', state.games[gameIndex]);
+      consolelog.info('emitted a gameplay event back over the socket - NO BROADCAST');
+      // modifys the relevant player and the gameboard
+      //now we need to push that to the database and to the player.
+      // update the players hand in the database
+      // emit the players hand
+      // emite the gamestate and the players id?
+
+    }
+    // We receive a request with a defenders turn
+    if (index.defenderindex != undefined) {
+      consolelog.info(JSON.stringify(index))
+
+      const gameIndex = state.games.findIndex((game) => game.gameID == index.gameID);
+      state.games[gameIndex].defenderPlay(index.defenderindex);
+
+      consolelog.info('server state game: ' + state.games[gameIndex])
+
+      sock.emit('gameplay', state.games[gameIndex]);
+      consolelog.info('emitted a gameplay event back over the socket - NO BROADCAST');
+      // modifys the relevant player and the gameboard
+      //now we need to push that to the database and to the player.    }
+    }
   });
 });
 

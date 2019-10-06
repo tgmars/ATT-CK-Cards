@@ -7,6 +7,7 @@ import { GameModel } from '@entities';
 import { logger } from '@shared';
 import { Document } from 'mongoose';
 import { Router } from 'express';
+import { state } from '@server';
 
 const router = Router();
 
@@ -61,8 +62,11 @@ export default class Command {
                     const opponentPlayer = await PlayerModel.findOne({name: this.commandArgs}, 'name');
 
                     if (opponentPlayer && currentPlayer) {
-                        const opponentName = opponentPlayer.toObject().name;
-                        const currentName = currentPlayer.toObject().name;
+                        const opponent = opponentPlayer.toObject();
+                        const current = currentPlayer.toObject();
+
+                        const opponentName = opponent.name;
+                        const currentName = current.name;
 
                         let attacker!: Document | null;
                         let defender!: Document | null;
@@ -91,7 +95,8 @@ export default class Command {
                         // Get the game id to use as a route and provide it to the user in the response.
                         const currentGame = await GameModel.find({attacker: attacker._id, defender: defender._id},
                              '_id');
-                        const currentGameID = currentGame[0].toObject()._id;
+                        const currentGameObject = currentGame[0].toObject();
+                        const currentGameID = currentGameObject._id;
 
                         // Update the players with their roles as attackers or defenders.
                         // Good lord this is getting messy
@@ -100,11 +105,21 @@ export default class Command {
                         const opponentObject = new Player(opIsAttacker, false, 'tempop', true);
                         playerObject.draw(5);
                         opponentObject.draw(5);
-                        
                         // Setup hand and the players progress
                         await currentPlayer.update( {hand: playerObject.hand, progress: playerObject.progress});
                         await opponentPlayer.update( {hand: opponentObject.hand, progress: opponentObject.progress});
-                       
+
+                        // populate local players for gameboard.
+                        playerObject._id = current._id;
+                        playerObject.name = current.name;
+
+                        opponentObject._id = opponent._id;
+                        opponentObject.name = opponent.name;
+
+                        // populate gameboard using those players and add them to state.
+                        let gb: GameBoard = new GameBoard(playerObject, opponentObject);
+                        gb.gameID = currentGameID;
+                        state.games.push(gb);
 
                         return this.commandNewGame(currentName, opponentName , currentGameID);
                     } else {

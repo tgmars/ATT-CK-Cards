@@ -79,7 +79,7 @@ import PlayersApi from '@/services/PlayersApi';
                 <div style='width:100%;padding:10px'>
                     <attacker-progress-view :attacker='gameboard.opponent'></attacker-progress-view>
                     <b-card-group deck>
-                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='attackCard' :key='attackCard.technique + index' @card-click='attackerPlay(index)'></attack-card-view>
+                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
@@ -88,7 +88,7 @@ import PlayersApi from '@/services/PlayersApi';
                 <div style='width:100%;padding:5px'>
                     <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
-                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='defenceCard.dataSource + index' :defenceCard='defenceCard' @card-click='defenderPlay(index)'></defence-card-view>
+                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='defenceCard.dataSource + index' :defenceCard='defenceCard'></defence-card-view>
                     </b-card-group>
                 </div>
             </b-row>
@@ -147,22 +147,11 @@ export default class GameView extends Vue {
 
     public gameID!: string;
 
+    // On placement of the gameview, check if we have a saved player
+    // if we do, request that playerdata from the api.
     constructor() {
         super();
         console.log('GameView was placed');
-        
-        if (document.cookie){
-            const cookieID = document.cookie.split(';')[0].split('=')[1];
-            console.log('cookieid: ' + cookieID)
-            PlayersApi.fetchPlayerByID(cookieID).then((response) => {
-                state.player = response.data.players;
-                console.log('response data players')
-                console.log(response.data.players)
-                console.log('state')
-                console.log(state);
-            });
-        }
-
         this.player = new Player(false,false,'player-player',false);
         this.opponent = new Player(false,false,'player-opponent',false);
         this.gameboard = new GameBoard(this.player,this.opponent);
@@ -174,40 +163,51 @@ export default class GameView extends Vue {
         this.gameID = this.$route.params.gameID;
         console.log('gameview mount this.gameID: ' + this.gameID)
         //  Make a GET to the API and request the game for our given id.
-        GamesApi.fetchGamesByID(this.gameID).then((response) => {
-            this.gameboard.setBoard(response.data.gameData);
-            console.log('gameboard opponent name: ' + this.gameboard.opponent.id)
-            console.log('gmaeboard player name: ' + this.gameboard.player.id)
 
-            PlayersApi.fetchPlayerByID(this.gameboard.player.id).then((resp) => {
-                const res = resp.data;
-                console.log('got player: ' + JSON.stringify(res))
+        // Initialisation
+        if (document.cookie){
+            const cookieID = document.cookie.split(';')[0].split('=')[1];
+            console.log('cookieid: ' + cookieID)
+            PlayersApi.fetchPlayerByID(cookieID).then((re) => {
+                state.player = re.data.players;
+                console.log('response data players')
+                console.log(re.data.players)
+                console.log('state')
+                console.log(state);
 
-                this.player.setPlayer(res.players)
-                this.player.setHandFaceup(true);
-                // Map player data from server to a local object.
-                console.log('converted to local player: ' + JSON.stringify(this.player))
-
+                GamesApi.fetchGamesByID(this.gameID).then((response) => {
+                    this.gameboard.setBoard(response.data.gameData);
+        
+                    console.log('response gamedata' + JSON.stringify(response.data.gameData));
+                    console.log('response gameboard' + JSON.stringify(this.gameboard));
+                    console.log('gameboard opponent name: ' + this.gameboard.opponent._id)
+                    console.log('gmaeboard player name: ' + this.gameboard.player._id)
+        
+                    PlayersApi.fetchPlayerByID(this.gameboard.player._id).then((resp) => {
+                        const res = resp.data;
+                        console.log('got player: ' + JSON.stringify(res))
+        
+                        this.player.setPlayer(res.players)
+                        this.player.setHandFaceup(true);
+                        // Map player data from server to a local object.
+                        console.log('converted to local player: ' + JSON.stringify(this.player))
+        
+                    });
+                    PlayersApi.fetchPlayerByID(this.gameboard.opponent._id).then((resp) => {
+                        const res = resp.data;
+                        console.log('got opponent: ' + JSON.stringify(res));
+        
+                        this.opponent.setPlayer(res.players);
+                        this.opponent.setHandFaceup(false);
+                        // Map player data from server to a local object.
+                        console.log('converted to local opponent ' + JSON.stringify(this.opponent))
+                    });
+                });
+                
             });
-            PlayersApi.fetchPlayerByID(this.gameboard.opponent.id).then((resp) => {
-                const res = resp.data;
-                console.log('got opponent: ' + JSON.stringify(res));
-
-                this.opponent.setPlayer(res.players);
-                this.opponent.setHandFaceup(false);
-                // Map player data from server to a local object.
-                console.log('converted to local opponent ' + JSON.stringify(this.opponent))
-
-
-
-            });
-        });
-
-
-
+        }
+        
     }
-
- 
 
     get playSpaceAttackCards() {
         const ac: any = [];
@@ -229,34 +229,39 @@ export default class GameView extends Vue {
         return dc;
     }
 
-    // /** Take an index to a card in the attackers hand, and play the game. */
-    // public attackerPlay(i: number) {
-    //     this.gameboard.attackerPlay(i);
-    // }
+    public async attackerPlay(i: number){
+        const index = {'attackerindex' : i, 'gameID': this.gameID};
+        try{
+            await this.$socket.client.emit('gameplay',index);
+            console.log('emitted gameplay event over websocket.')
 
-    // /** Take an index to a card in the defenders hand, and play the game. */
-    // public defenderPlay(i: number) {
-    //     this.gameboard.defenderPlay(i);
-    // }
+        } catch (err) {
+            console.log('attack player error transmitting over websocket.');
+        }
+    }
 
-    // async send(){
-    //     console.log('got textarea: ' + this.input);
-    //     const msg = new Message(state.player,this.input).toObject();
-    //     // MessagesApi.addMessage(msg)
-    //     let response = await this.$socket.client.emit('chat',msg);
-    //     this.input=''
-    // }
+    public async defenderPlay(i: number){
+        const index = {'defenderindex' : i, 'gameID': this.gameID};
+        try{
+            await this.$socket.client.emit('gameplay',index);
+            console.log('emitted gameplay event over websocket.')
+        } catch (err) {
+            console.log('attack player error transmitting over websocket.');
+        }
+    }
 
     @Socket() // --> listens to the event connect
     public connect() {
       console.log('socket connection established inside gameview');
     }
 
-    // @Socket('chat')  // --> listens to the event labelled chat
-    // public onChat(msg: MessageInterface) {
-    //   this.messages.splice(this.messages.length, 0, msg);
-    // }
-
-
-
+    @Socket('gameplay')  // --> listens to the event labelled chat
+    public onGameplay(gameboard: GameBoard) {
+        console.log('received gameboard update over websocket: ' + gameboard);
+        // pass gameboard and players as parameters to onGameplay
+        // Set player for opponent and player
+        // Set the facuep values of the cards. 
+        // Set gameboard
+        this.gameboard = gameboard;
+    }
 }

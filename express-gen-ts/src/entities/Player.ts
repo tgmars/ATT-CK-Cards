@@ -27,18 +27,3 @@ const PlayerSchema = new mongoose.Schema({
 });
 
 export const PlayerModel = mongoose.model('Player', PlayerSchema);
-
-
-    // /**Initialises as player1 and player2. Use /setname in chat to overwrite.*/
-    // name:string
-
-    // /** False for defender, True for attacker */
-    // role:boolean
-    // /** Additional role for bot player */
-    // isBot:boolean
-    // resources:number
-    // opponent:boolean
-
-    // hand:Array<Card>
-    // handMaxLength:number = 5
-    // deck?:Array<Card>

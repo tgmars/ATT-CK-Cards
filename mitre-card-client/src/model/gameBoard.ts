@@ -44,14 +44,21 @@ class GameBoard {
         this.gameID = gameData._id;
         this.gameStateMessage = gameData.gameState;
         this.currentTurn = gameData.turn;
+        console.log('state.player.id: ' + state.player._id)
+        console.log('attacker.id: ' + gameData.attacker)
+        console.log('defender.id: ' + gameData.defender)
         if(gameData.attacker == state.player._id) {
-            this.player.id = gameData.attacker;
-            this.opponent.id = gameData.defender;
+            this.player._id = gameData.attacker;
+            this.opponent._id = gameData.defender;
         } else if (gameData.defender == state.player._id) {
-            this.player.id = gameData.defender;
-            this.opponent.id = gameData.attacker;
+            this.player._id = gameData.defender;
+            this.opponent._id = gameData.attacker;
         }
+        if (gameData.playSpace){
+            this.playSpace = gameData.playSpace;
+        } else {
         this.playSpace = [];
+        }
     }
 
     getPlayer():Player{ return this.player }

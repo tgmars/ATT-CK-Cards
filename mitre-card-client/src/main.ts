@@ -8,6 +8,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { State } from './model/state';
 import VueSocketIOExt from 'vue-socket.io-extended';
 import io from 'socket.io-client';
+import PlayersApi from './services/PlayersApi';
  
 const socket = io('http://localhost:3000');
  
@@ -16,9 +17,11 @@ Vue.use(BootstrapVue);
 Vue.use(VueSocketIOExt, socket);
 
 export let state: State = {
-    player: {name: '', hand: [], isBot: false, resources: 0, role: false, _id: ''},
+    player: {name: '', hand: [], isBot: false, resources: 0, role: false, _id: '',progress:[],persistentProgress:[]},
     chatShown: true,
   };
+
+
   
 new Vue({
   router,

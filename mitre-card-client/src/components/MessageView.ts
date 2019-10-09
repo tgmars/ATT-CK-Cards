@@ -15,7 +15,8 @@ import { state } from '@/main';
             <b-badge variant='secondary'>{{message.time | localDateTime}}</b-badge>
             <b-badge v-if='message.player.name == playername' variant='primary'>{{message.player.name}}</b-badge>
             <b-badge v-else variant='info'>{{message.player.name}}</b-badge>
-            <span style='font-size:0.8em'>{{message.message}}</span>
+            <span v-if='url' style='font-size:0.8em'><router-link :to="{ name: 'games', params: {gameID: gameID}}">Game available here.</router-link></span>
+            <span v-else style='font-size:0.8em'>{{message.message}}</span>
         <hr style='margin-top:0.3rem;margin-bottom:0.3rem'>
         </div>
     </div>
@@ -36,5 +37,21 @@ export default class MessageView extends Vue {
 
     constructor(){
         super();
+    }
+
+    get url(): boolean{
+        if (this.message.message.split('%(.)')[1]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    get gameID(): string{
+        if (this.message.message.split('%(.)')[1]) {
+            return this.message.message.split('%(.)')[1];
+        } else {
+            return ''
+        }
     }
 }

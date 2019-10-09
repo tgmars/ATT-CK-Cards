@@ -158,55 +158,7 @@ export default class GameView extends Vue {
     }
 
     mounted(){
-        // On component mount create a new gameboard with data fetched from the API
-        // Fetch player and opponent using the ID specified in the game object we return.
-        this.gameID = this.$route.params.gameID;
-        console.log('gameview mount this.gameID: ' + this.gameID)
-        //  Make a GET to the API and request the game for our given id.
-
-        // Initialisation
-        if (document.cookie){
-            const cookieID = document.cookie.split(';')[0].split('=')[1];
-            console.log('cookieid: ' + cookieID)
-            PlayersApi.fetchPlayerByID(cookieID).then((re) => {
-                state.player = re.data.players;
-                console.log('response data players')
-                console.log(re.data.players)
-                console.log('state')
-                console.log(state);
-
-                GamesApi.fetchGamesByID(this.gameID).then((response) => {
-                    this.gameboard.setBoard(response.data.gameData);
-        
-                    console.log('response gamedata' + JSON.stringify(response.data.gameData));
-                    console.log('response gameboard' + JSON.stringify(this.gameboard));
-                    console.log('gameboard opponent name: ' + this.gameboard.opponent._id)
-                    console.log('gmaeboard player name: ' + this.gameboard.player._id)
-        
-                    PlayersApi.fetchPlayerByID(this.gameboard.player._id).then((resp) => {
-                        const res = resp.data;
-                        console.log('got player: ' + JSON.stringify(res))
-        
-                        this.player.setPlayer(res.players)
-                        this.player.setHandFaceup(true);
-                        // Map player data from server to a local object.
-                        console.log('converted to local player: ' + JSON.stringify(this.player))
-        
-                    });
-                    PlayersApi.fetchPlayerByID(this.gameboard.opponent._id).then((resp) => {
-                        const res = resp.data;
-                        console.log('got opponent: ' + JSON.stringify(res));
-        
-                        this.opponent.setPlayer(res.players);
-                        this.opponent.setHandFaceup(false);
-                        // Map player data from server to a local object.
-                        console.log('converted to local opponent ' + JSON.stringify(this.opponent))
-                    });
-                });
-                
-            });
-        }
-        
+        this.reInit();        
     }
 
     get playSpaceAttackCards() {
@@ -272,5 +224,56 @@ export default class GameView extends Vue {
         // Set player for opponent and player
         // Set the facuep values of the cards. 
         // Set gameboard
+    }
+
+    reInit(){
+        // On component mount create a new gameboard with data fetched from the API
+        // Fetch player and opponent using the ID specified in the game object we return.
+        this.gameID = this.$route.params.gameID;
+        console.log('gameview mount this.gameID: ' + this.gameID)
+        //  Make a GET to the API and request the game for our given id.
+
+        // Initialisation
+        if (document.cookie){
+            const cookieID = document.cookie.split(';')[0].split('=')[1];
+            console.log('cookieid: ' + cookieID)
+            PlayersApi.fetchPlayerByID(cookieID).then((re) => {
+                state.player = re.data.players;
+                console.log('response data players')
+                console.log(re.data.players)
+                console.log('state')
+                console.log(state);
+
+                GamesApi.fetchGamesByID(this.gameID).then((response) => {
+                    this.gameboard.setBoard(response.data.gameData);
+        
+                    console.log('response gamedata' + JSON.stringify(response.data.gameData));
+                    console.log('response gameboard' + JSON.stringify(this.gameboard));
+                    console.log('gameboard opponent name: ' + this.gameboard.opponent._id)
+                    console.log('gmaeboard player name: ' + this.gameboard.player._id)
+        
+                    PlayersApi.fetchPlayerByID(this.gameboard.player._id).then((resp) => {
+                        const res = resp.data;
+                        console.log('got player: ' + JSON.stringify(res))
+        
+                        this.player.setPlayer(res.players)
+                        this.player.setHandFaceup(true);
+                        // Map player data from server to a local object.
+                        console.log('converted to local player: ' + JSON.stringify(this.player))
+        
+                    });
+                    PlayersApi.fetchPlayerByID(this.gameboard.opponent._id).then((resp) => {
+                        const res = resp.data;
+                        console.log('got opponent: ' + JSON.stringify(res));
+        
+                        this.opponent.setPlayer(res.players);
+                        this.opponent.setHandFaceup(false);
+                        // Map player data from server to a local object.
+                        console.log('converted to local opponent ' + JSON.stringify(this.opponent))
+                    });
+                });
+                
+            });
+        }
     }
 }

@@ -184,7 +184,8 @@ export default class Command {
     public commandNewGame(opponentName: string, playerName: string, gameID: string): MessageInterface {
             // Stub for hooking the gameboard up to a page.
             // game.linkToRoute()
-            return this.createCommandResponse('Game created between ' + playerName + ' and ' + opponentName + '. The game is available at /games/' + gameID);
+            return this.createCommandResponse('Game created between ' + playerName + ' and ' +
+            opponentName + '. %(.)' + gameID);
     }
 
     public commandInvalid(): MessageInterface {

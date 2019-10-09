@@ -29,6 +29,7 @@ export default new Router({
     },
     {
       path: '/games/:gameID',
+      name: 'games',
       component: MainView,
     },
     {

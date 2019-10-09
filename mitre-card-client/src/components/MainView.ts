@@ -23,7 +23,7 @@ import { state } from '@/main';
                 <chat-view style='height: calc(100vh - 56px)'></chat-view>
             </b-col>
             <b-col cols='9' class='game' style='padding-left:10px'>
-                <game-view style='height: calc(100vh - 56px)'></game-view>
+                <game-view v-if='gameID' :key='gameID' style='height: calc(100vh - 56px)'></game-view>
             </b-col>
         </b-row>
     </b-container>
@@ -35,9 +35,12 @@ import { state } from '@/main';
 export default class MainView extends Vue {
 
     public chatShown = state.chatShown;
+    public gameID!: string;
+
 
     constructor() {
         super();
+        this.gameID = window.location.href;
     }
 
     /**

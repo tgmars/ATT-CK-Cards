@@ -14,9 +14,9 @@ import { state } from '@/main'
   
       <b-collapse id='nav-collapse' is-nav>
         <b-navbar-nav>
-          <b-nav-item v-on:click='setChatShown'>Show/Hide Chat</b-nav-item>
+          <b-nav-item v-on:click='setChatShown' style='color:white'>Show/Hide Chat</b-nav-item>
           <b-nav-item>
-            <router-link to="/stats">Statistics</router-link></b-nav-item>
+            <router-link to="/stats" style='color:white'>Statistics</router-link></b-nav-item>
         </b-navbar-nav>
   
        

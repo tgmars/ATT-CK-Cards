@@ -9,6 +9,7 @@ import PlayersApi from '@/services/PlayersApi';
 import Player from '@/model/player';
 import { State } from '@/model/state';
 import { state } from '@/main';
+import { Watch, Prop } from 'vue-property-decorator';
 
 
 
@@ -23,7 +24,7 @@ import { state } from '@/main';
                 <chat-view style='height: calc(100vh - 56px)'></chat-view>
             </b-col>
             <b-col cols='9' class='game' style='padding-left:10px'>
-                <game-view v-if='gameID' :key='gameID' style='height: calc(100vh - 56px)'></game-view>
+                <game-view v-if='gameShown' :key='gameID' style='height: calc(100vh - 56px)'></game-view>
             </b-col>
         </b-row>
     </b-container>
@@ -34,13 +35,19 @@ import { state } from '@/main';
 
 export default class MainView extends Vue {
 
+    @Prop()
     public chatShown = state.chatShown;
     public gameID!: string;
+
+    public gameShown: boolean = false;
 
 
     constructor() {
         super();
         this.gameID = window.location.href;
+        if(this.gameID.split('/',4)[3]=='games'){
+            this.gameShown = true;
+        }
     }
 
     /**
@@ -50,7 +57,24 @@ export default class MainView extends Vue {
     mounted(){
         this.addPlayer()
     }
-    
+
+
+    @Watch('$route', { immediate: true, deep: true })
+    onUrlChange(newVal: any) {
+        console.log(newVal);
+        if(newVal.path.split('/')[1]=='games'){
+            this.gameShown = true;
+        }
+        console.log('gameshow' + this.gameShown)
+    }
+
+    update(){
+        this.gameID = window.location.href;
+        if(this.gameID.split('/',4)[3]=='games'){
+            this.gameShown = true;
+        }
+    }
+
     public async addPlayer() {
 
         if (!document.cookie) {

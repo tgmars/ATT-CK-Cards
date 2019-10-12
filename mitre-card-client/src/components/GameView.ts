@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 
 import {GameBoard} from '../model/gameBoard';
 import AttackCardView from './AttackCardView';
@@ -158,7 +159,14 @@ export default class GameView extends Vue {
     }
 
     mounted(){
-        this.reInit();        
+        this.reInit();
+        this.$socket.client.emit('gameplay',{'idupdate' : 'idupdate', 'gameID': this.gameID});
+    }
+
+    @Watch('$route', { immediate: true, deep: true })
+    onUrlChange(newVal: any) {
+        this.reInit();
+        this.$socket.client.emit('gameplay',{'idupdate' : 'idupdate', 'gameID': this.gameID});
     }
 
     get playSpaceAttackCards() {

@@ -24,6 +24,11 @@ const PlayerSchema = new mongoose.Schema({
         required: false,
     },
     progress :  ProgressSchema,
+    persistentProgress : ProgressSchema,
+    opponent : {
+        type: Boolean,
+        required: false,
+    },
 });
 
 export const PlayerModel = mongoose.model('Player', PlayerSchema);

@@ -118,7 +118,8 @@ io.on('connection', (sock) => {
     if (index.defenderindex != undefined) {
       // consolelog.info(JSON.stringify(index))
       const gameIndex = state.games.findIndex((game) => game.gameID == index.gameID);
-
+    
+      consolelog.info('attackers turn?: ' + state.games[gameIndex].isAttackerTurn());
       if (state.games[gameIndex].isAttackerTurn()) {
         consolelog.info('not defenders turn');
       } else {

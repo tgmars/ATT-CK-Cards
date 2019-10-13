@@ -1,5 +1,6 @@
 import {AttackCard, DefenceCard, Card} from './card';
 import { mitre } from '../Server';
+import { logger } from '@shared';
 
 export default class Player {
     /**Initialises as player1 and player2. Use /setname in chat to overwrite.*/
@@ -56,12 +57,14 @@ export default class Player {
         this.resources = player.resources;
         this.progress = player.progress;
         this.persistentProgress = player.persistentProgress;
+        this.opponent = player.opponent;
 
     }
 
     // Generate JSON for a database update from the current object.
     public toCompliantObject() {
-        return {hand: this.hand, progress: this.progress, resources: this.resources};
+        return {hand: this.hand, progress: this.progress,
+            persistentProgress: this.persistentProgress, resources: this.resources};
     }
 
     /**
@@ -172,15 +175,18 @@ export default class Player {
 
     /** Nope */
     public setProgress(tactic: string) {
-        switch (tactic) {
-            case 'initial-access': {
-                this.progress['initial-access'] = false;
-                this.progress.execution= true;
-                this.persistentProgress.execution= true;
+        logger.info('tactic: ' + tactic);
 
+        switch (tactic) {
+            case "initial-access": {
+                this.progress['initial-access'] = false;
+                this.progress['execution'] = true;
+                this.persistentProgress['execution'] = true;
                 break;
             }
-            case 'execution': {
+            case "execution": {
+                logger.info('progress exe' + this.progress.execution);
+                logger.info(this.progress);
                 this.progress.execution= false;
                 this.progress.persistence= true;
                 this.persistentProgress.persistence= true;

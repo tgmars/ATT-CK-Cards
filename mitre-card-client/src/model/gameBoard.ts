@@ -37,6 +37,50 @@ class GameBoard {
         console.log('Currentturn: ' + this.currentTurn);
     }
 
+    public setSocketBoard(gameboard: GameBoard){
+        this.gameID = gameboard.gameID;
+        this.gameStateMessage = gameboard.gameStateMessage;
+        this.currentTurn = gameboard.currentTurn;
+
+
+        if (gameboard.playSpace) {
+            gameboard.playSpace.forEach(( card: any ) => {
+                if(card.tactic != undefined){
+                    console.log('converting recvd gamedata card to an attackcard')
+                    const ac = new AttackCard(card.tactic, card.technique, card.description, card.mitigatingSources);
+                    this.playSpace.push(ac)
+                } else if (card.dataSource != undefined) {
+                    console.log('converting recvd gamedata card to an defencecard')
+                    const dc = new DefenceCard(card.dataSource)
+                    this.playSpace.push(dc)
+                }
+            })
+            this.playSpace = gameboard.playSpace;
+            
+        } else {
+        this.playSpace = [];
+        }
+        
+        console.log('may need to increase fidelity in assigning player info.')
+
+        if (gameboard.player._id == state.player._id) {
+            console.log('player matches state')
+            if (gameboard.player.role && state.player.role){
+                console.log('set current board player as player in gameboard')
+                // setplayer is robust enough for the incoming data to work.
+                this.player.setPlayer(gameboard.player);
+                this.opponent.setPlayer(gameboard.opponent);
+            }
+        } else if (gameboard.opponent._id == state.player._id) { // the other id will be the other player
+            console.log('opponent matched state')
+            if ( gameboard.opponent.role && state.player.role){
+                console.log('set current player as gameboard opp and vice versa.')
+                this.player.setPlayer(gameboard.opponent);
+                this.opponent.setPlayer(gameboard.player);
+            }
+        }
+    }
+
     public setBoard(gameData: any) {
         console.log('updating board details with received gameData...');
         console.log('gamedata id: ' + gameData._id);

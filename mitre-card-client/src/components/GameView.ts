@@ -20,53 +20,59 @@ import PlayersApi from '@/services/PlayersApi';
     template:
     `
     <div>
-        <span><game-status-view :gameboard='gameboard'></game-status-view> -- {{player.name}} {{gameboard.player.name}} {{gameboard.playSpace}}</span>
+        <span><game-status-view :gameboard='gameboard'></game-status-view></span>
         <div v-if='!gameboard.valid'>
             <b-container style='margin:3px'>
             <b-row v-if='gameboard.opponent.role'>
                 <div style='width:100%;padding:10px'>
+                <div style='width:100%;font-size:12px;'>Attacker resources remaining: {{gameboard.opponent.resources}}</div>
                     <attacker-progress-view :attacker='gameboard.opponent'></attacker-progress-view>
                     <b-card-group deck>
-                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
+                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='attackCard' :key='"hand" + attackCard.technique + index'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row v-if='!gameboard.opponent.role'>
                 <div style='width:100%;padding:5px'>
-                    <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
-                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='defenceCard.dataSource + index' :defenceCard='defenceCard' ></defence-card-view>
+                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='"hand" + defenceCard.dataSource + index' :defenceCard='defenceCard' ></defence-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row id='playspace'>
                 <div style='height:450px;width:100%;' >
-                    <b-card-group deck style='margin:0px'>
+                    <b-card-group v-if='gameboard.opponent.role' deck style='margin:0px'>
                         <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
                     </b-card-group>
+                    <b-card-group v-if='!gameboard.opponent.role' deck style='margin:0px'>
+                        <defence-card-view v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                    </b-card-group>
                     <div style='width:100%;height:4px;background-color:black'></div>
-                    <b-card-group deck style='margin:0px'>
-                        <defence-card-view  v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                    <b-card-group v-if='!gameboard.player.role' deck style='margin:0px'>
+                        <defence-card-view v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                    </b-card-group>
+                    <b-card-group v-if='gameboard.player.role' deck style='margin:0px'>
+                        <attack-card-view v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row v-if='!gameboard.player.role'>
                 <div style='width:100%;padding:5px'>
-                    <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
-                        <defence-card-view  v-for='(defenceCard,index) in gameboard.player.hand' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                        <defence-card-view  v-for='(defenceCard,index) in gameboard.player.hand' :defenceCard='defenceCard' :key='"hand" + defenceCard.dataSource + index'></defence-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row v-if='gameboard.player.role'>
                 <div style='width:100%;padding:5px'>
+                <div style='width:100%;font-size:12px;'>Attacker resources remaining: {{gameboard.player.resources}}</div>
                     <attacker-progress-view :attacker='gameboard.player'></attacker-progress-view>
                     <b-card-group deck>
-                        <attack-card-view  v-for='(attackCard,index) in gameboard.player.hand' :attackCard='attackCard'  :key='attackCard.technique + index'></attack-card-view>
+                        <attack-card-view  v-for='(attackCard,index) in gameboard.player.hand' :attackCard='attackCard'  :key='"hand" + attackCard.technique + index'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
@@ -78,9 +84,10 @@ import PlayersApi from '@/services/PlayersApi';
             <b-container style='margin:3px'>
             <b-row v-if='gameboard.opponent.role'>
                 <div style='width:100%;padding:10px'>
+                <div style='width:100%;font-size:12px;'>Attacker resources remaining: {{gameboard.opponent.resources}}</div>
                     <attacker-progress-view :attacker='gameboard.opponent'></attacker-progress-view>
                     <b-card-group deck>
-                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
+                        <attack-card-view  v-for='(attackCard,index) in gameboard.opponent.hand' :attackCard='"hand" + attackCard' :key='attackCard.technique + index'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
@@ -89,37 +96,43 @@ import PlayersApi from '@/services/PlayersApi';
                 <div style='width:100%;padding:5px'>
                     <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
-                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='defenceCard.dataSource + index' :defenceCard='defenceCard'></defence-card-view>
+                        <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='"hand" + defenceCard.dataSource + index' :defenceCard='defenceCard'></defence-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row id='playspace'>
                 <div style='height:450px;width:100%;' >
-                    <b-card-group deck style='margin:0px'>
-                        <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
-                    </b-card-group>
-                    <div style='width:100%;height:4px;background-color:black'></div>
-                    <b-card-group deck style='margin:0px'>
-                        <defence-card-view  v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
-                    </b-card-group>
+                <b-card-group v-if='gameboard.opponent.role' deck style='margin:0px'>
+                    <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
+                </b-card-group>
+                <b-card-group v-if='!gameboard.opponent.role' deck style='margin:0px'>
+                    <defence-card-view v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                </b-card-group>
+                <div style='width:100%;height:4px;background-color:black'></div>
+                <b-card-group v-if='!gameboard.player.role' deck style='margin:0px'>
+                    <defence-card-view v-for='(defenceCard,index) in playSpaceDefenceCards' :defenceCard='defenceCard' :key='defenceCard.dataSource + index'></defence-card-view>
+                </b-card-group>
+                <b-card-group v-if='gameboard.player.role' deck style='margin:0px'>
+                    <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
+                </b-card-group>
                 </div>
             </b-row>
 
             <b-row v-if='!gameboard.player.role'>
                 <div style='width:100%;padding:5px'>
-                    <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
-                        <defence-card-view  v-for='(defenceCard,index) in gameboard.player.hand' :defenceCard='defenceCard' :key='defenceCard.dataSource + index' @card-click='defenderPlay(index)'></defence-card-view>
+                        <defence-card-view  v-for='(defenceCard,index) in gameboard.player.hand' :defenceCard='defenceCard' :key='"hand" + defenceCard.dataSource + index' @card-click='defenderPlay(index)'></defence-card-view>
                     </b-card-group>
                 </div>
             </b-row>
 
             <b-row v-if='gameboard.player.role'>
                 <div style='width:100%;padding:5px'>
+                <div style='width:100%;font-size:12px;'>Attacker resources remaining: {{gameboard.player.resources}}</div>
                     <attacker-progress-view :attacker='gameboard.player'></attacker-progress-view>
                     <b-card-group deck>
-                        <attack-card-view  v-for='(attackCard,index) in gameboard.player.hand' :attackCard='attackCard'  :key='attackCard.technique + index' @card-click='attackerPlay(index)'></attack-card-view>
+                        <attack-card-view  v-for='(attackCard,index) in gameboard.player.hand' :attackCard='attackCard'  :key='"hand" + attackCard.technique + index' @card-click='attackerPlay(index)'></attack-card-view>
                     </b-card-group>
                 </div>
             </b-row>
@@ -223,11 +236,14 @@ export default class GameView extends Vue {
     @Socket('gameplay')  // --> listens to the event labelled chat
     public onGameplay(gameboard: GameBoard) {
         console.log('received gameboard update over websocket: ' + JSON.stringify(gameboard));
-        this.opponent.setPlayer(gameboard.player);
+        // Reshuffle the current gameboard based off what we already know and the data that we get from the server.
+        // Received player is attacker, and our player (for viewing) is attacker
+        
+        this.gameboard.setSocketBoard(gameboard);
+        console.log('this.gameboard: ' + JSON.stringify(this.gameboard));
+
         this.opponent.setHandFaceup(false);
-        this.player.setPlayer(gameboard.opponent);
-        this.player.setHandFaceup(false);
-        this.gameboard.setBoard(gameboard);
+        this.player.setHandFaceup(true);
         // pass gameboard and players as parameters to onGameplay
         // Set player for opponent and player
         // Set the facuep values of the cards. 

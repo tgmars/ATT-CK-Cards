@@ -20,7 +20,7 @@ import { Watch, Prop } from 'vue-property-decorator';
     <navbar></navbar>
     <b-container fluid style='padding-right:0px;padding-left:0px;'>
         <b-row no-gutters>
-            <b-col cols='3' v-if='chatShown' class='chat'>
+            <b-col cols='3' class='chat'>
                 <chat-view style='height: calc(100vh - 56px)'></chat-view>
             </b-col>
             <b-col cols='9' class='game' style='padding-left:10px'>

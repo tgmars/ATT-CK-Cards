@@ -76,16 +76,16 @@ export default class Command {
                         if (Math.random() > 0.5) {
                             attacker = currentPlayer;
                             defender = opponentPlayer;
-                            await currentPlayer.update( {role: true} );
-                            await opponentPlayer.update( {role: false} );
+                            await currentPlayer.update( {role: true, opponent: false} );
+                            await opponentPlayer.update( {role: false, opponent: true} );
                             cpIsAttacker = true;
                             opIsAttacker = false;
 
                         } else {
                             attacker = opponentPlayer;
                             defender = currentPlayer;
-                            await currentPlayer.update( {role: false} );
-                            await opponentPlayer.update( {role: true} );
+                            await currentPlayer.update( {role: false, opponent: false} );
+                            await opponentPlayer.update( {role: true, opponent: true} );
                             cpIsAttacker = false;
                             opIsAttacker = true;
                         }
@@ -106,8 +106,10 @@ export default class Command {
                         playerObject.draw(5);
                         opponentObject.draw(5);
                         // Setup hand and the players progress
-                        await currentPlayer.update( {hand: playerObject.hand, progress: playerObject.progress});
-                        await opponentPlayer.update( {hand: opponentObject.hand, progress: opponentObject.progress});
+                        await currentPlayer.update( {hand: playerObject.hand, progress: playerObject.progress,
+                            persistentProgress: playerObject.persistentProgress});
+                        await opponentPlayer.update( {hand: opponentObject.hand, progress: opponentObject.progress,
+                            persistentProgress: playerObject.persistentProgress});
 
                         // populate local players for gameboard.
                         playerObject._id = current._id;
@@ -119,6 +121,7 @@ export default class Command {
                         // populate gameboard using those players and add them to state.
                         let gb: GameBoard = new GameBoard(playerObject, opponentObject);
                         gb.gameID = currentGameID;
+                        gb.currentTurn = false;
                         state.games.push(gb);
 
                         return this.commandNewGame(currentName, opponentName , currentGameID);

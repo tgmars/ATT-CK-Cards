@@ -27,10 +27,6 @@ class GameBoard {
 
         // Establish who goes first in this game.
         this.currentTurn = false;
-        if (player.isDefender()) {
-            this.currentTurn = true;
-        }
-
         this.valid = true;
         this.gameStateMessage = 'Gamestate: Playing';
     }
@@ -138,6 +134,7 @@ class GameBoard {
     public attackerPlay(i: number) {
         if (this.isAttackerTurn()) {
             const attacker = (this.player.isAttacker() ? this.player : this.opponent);
+            logger.info('attacker play - attacker: ' + JSON.stringify(this.player));
             const playercard = attacker.hand[i] as AttackCard;
             playercard.faceup = true;
 
@@ -166,13 +163,20 @@ class GameBoard {
             /** Remove resources from the attacker. */
             if (attackCardRemoved) {
                 attacker.resources = attacker.resources - 10;
+                logger.info('Took 10 from attacker resources');
             }
 
             if (dc.length == 0) {
-                console.log('I think length of defence cards is 0');
-                attacker.setProgress(playercard.tactic);
+                logger.info('I think length of defence cards is 0');
+                logger.info('Attacker progress not undefined?: ' + JSON.stringify(attacker.progress));
+                try {
+                    attacker.setProgress(playercard.tactic);
+                } catch (err) {
+                    logger.error('Err catch: ' + err);
+                }
                 // move the deleted card to the discard pile
             }
+            logger.info(attacker.progress);
 
             // Check for a win/loss condition
             if (attacker.resources <= 0) {
@@ -185,6 +189,7 @@ class GameBoard {
                 attacker.draw(1);
                 // Flip the turn back to the defender
                 this.currentTurn = !this.currentTurn;
+                this.gameStateMessage = 'Defenders turn (ss)';
                 console.log(playercard);
             }
         }
@@ -196,6 +201,7 @@ class GameBoard {
      */
     public defenderPlay(i: number) {
         if (this.isDefenderTurn()) {
+            logger.info('defender play - defender: ' + JSON.stringify(this.player));
             const defender = (this.player.isDefender() ? this.player : this.opponent);
             const attacker = (this.player.isAttacker() ? this.player : this.opponent);
 
@@ -215,6 +221,7 @@ class GameBoard {
                 defender.draw(1);
                 // Flip the turn back to the attacker.
                 this.currentTurn = !this.currentTurn;
+                this.gameStateMessage = 'Attackers turn (ss)';
                 console.log(playercard);
             }
         }

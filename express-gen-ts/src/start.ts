@@ -17,14 +17,19 @@ async function readGamesDB() {
     gamedocs.forEach((gamedoc) => {
         const obj = gamedoc.toObject();
         const player = obj.attacker;
-        const p1: Player = new Player(true, false, player.name, false);
+        const p1: Player = new Player(true, false, player.name, player.opponent);
         p1.setPlayer(player);
 
         const opp = obj.defender;
-        const p2: Player = new Player(false, false, opp.name, true);
+        const p2: Player = new Player(false, false, opp.name, player.opponent);
         p2.setPlayer(opp);
 
-        const game = new GameBoard(p1, p2);
+        let game: GameBoard;
+        if (!p1.opponent) {
+            game = new GameBoard(p1, p2);
+        } else {
+            game = new GameBoard(p2, p1);
+        }
         game.setBoard(obj);
         state.games.push(game);
     });

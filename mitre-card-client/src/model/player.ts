@@ -53,10 +53,22 @@ export default class Player {
         this.role = player.role;
         this.isBot = player.isBot;
         this._id = player._id;
-        this.hand = player.hand;
         this.resources = player.resources;
         this.progress = player.progress;
-        this.persistentProgress = this.progress        
+        this.persistentProgress = player.persistentProgress;    
+
+        player.hand.forEach(( card: any, index: number) => {
+            if(card.tactic != undefined){
+                console.log('converting recvd gamedata card to an attackcard for hand')
+                const ac = new AttackCard(card.tactic, card.technique, card.description, card.mitigatingSources);
+                this.hand.splice(index,1,ac)
+            } else if (card.dataSource != undefined) {
+                console.log('converting recvd gamedata card to an defencecard for hand')
+                const dc = new DefenceCard(card.dataSource)
+                this.hand.splice(index,1,dc)
+            }
+        })
+
     }
 
     /**

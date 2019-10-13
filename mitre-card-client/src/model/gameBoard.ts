@@ -60,7 +60,7 @@ class GameBoard {
         } else {
         this.playSpace = [];
         }
-        
+
         console.log('may need to increase fidelity in assigning player info.')
 
         if (gameboard.player._id == state.player._id) {
@@ -250,9 +250,11 @@ class GameBoard {
             if (attacker.resources <= 0) {
                 this.gameStateMessage = 'Gamestate: Defender won! The attacker has run out of resources (go blueteams).';
                 this.valid = false;
+                this.playSpace = []
             } else if (attacker.progress.impact) {
                 this.gameStateMessage = 'Gamestate: Attacker won! The attacker has progressed through all avaiable tactics.';
                 this.valid = false;
+                this.playSpace = []
             } else {
                 attacker.draw(1);
                 // Flip the turn back to the defender

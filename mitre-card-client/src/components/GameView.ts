@@ -42,7 +42,7 @@ import PlayersApi from '@/services/PlayersApi';
             </b-row>
 
             <b-row id='playspace'>
-                <div style='height:450px;width:100%;' >
+                <div style='height:600px;width:100%;' >
                     <b-card-group v-if='gameboard.opponent.role' deck style='margin:0px'>
                         <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
                     </b-card-group>
@@ -94,7 +94,6 @@ import PlayersApi from '@/services/PlayersApi';
 
             <b-row v-if='!gameboard.opponent.role'>
                 <div style='width:100%;padding:5px'>
-                    <div style='width:100%;font-size:12px;'>Attacker resources: {{gameboard.opponent.resources}}</div>
                     <b-card-group deck>
                         <defence-card-view  v-for='(defenceCard,index) in gameboard.opponent.hand' :key='"hand" + defenceCard.dataSource + index' :defenceCard='defenceCard'></defence-card-view>
                     </b-card-group>
@@ -102,7 +101,7 @@ import PlayersApi from '@/services/PlayersApi';
             </b-row>
 
             <b-row id='playspace'>
-                <div style='height:450px;width:100%;' >
+                <div style='height:600px;width:100%;' >
                 <b-card-group v-if='gameboard.opponent.role' deck style='margin:0px'>
                     <attack-card-view  v-for='(attackCard,index) in playSpaceAttackCards' :attackCard='attackCard' :key='attackCard.technique + index'></attack-card-view>
                 </b-card-group>
